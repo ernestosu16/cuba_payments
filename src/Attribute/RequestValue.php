@@ -2,7 +2,9 @@
 
 namespace Lnx\CubaPayment\Attribute;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PROPERTY, Attribute::TARGET_METHOD)]
 class RequestValue
 {
     public function __construct(

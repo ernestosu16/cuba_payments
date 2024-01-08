@@ -25,9 +25,15 @@ final class PaymentManager
     {
     }
 
-    public function withTokenManager(string $tokenManagerClass): void
+    public function getTokenManager(): Guzzle\Manager\TokenManagerInterface
+    {
+        return $this->getManager()->getClientBuilder()->getTokenManager();
+    }
+
+    public function withTokenManager(string $tokenManagerClass): PaymentManager
     {
         $this->tokenManagerClass = $tokenManagerClass;
+        return $this;
     }
 
     private function getManager(): ManagerInterface
@@ -73,15 +79,16 @@ final class PaymentManager
             }
         }
 
-        if (count($reflection->getProperties()) == 0 && count($required) > 0) {
+        $properties = $reflection->getProperties();
+        if (count($properties) == 0 && count($required) > 0) {
             throw new RuntimeException(sprintf(
-                'Es requerido pasar el valor para %s, use el atributo "RequestValue" en la propiedad',
-                $required[0]
+                'Es requerido pasar el valor para %s, use el atributo "RequestValue" en la propiedad "%s"',
+                $required[0], $payment::class
             ));
         }
 
         # Property attribute
-        foreach ($reflection->getProperties() as $property) {
+        foreach ($properties as $property) {
             $property = new ReflectionProperty($payment::class, $property->getName());
             $attributes = $property->getAttributes();
             foreach ($attributes as $attribute) {

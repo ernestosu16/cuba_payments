@@ -9,28 +9,32 @@ use Lnx\CubaPayment\Config\ConfigInterfaces;
 use Lnx\CubaPayment\Guzzle\Manager\TokenManagerInterface;
 use Lnx\CubaPayment\Guzzle\Middleware\DefaultHeadersMiddleware;
 use Lnx\CubaPayment\Guzzle\Middleware\TokenMiddleware;
-use Lnx\CubaPayment\Guzzle\Token\TokenInterface;
 
 final class ClientBuilder
 {
+    private TokenManagerInterface $tokenManager;
     private ?string $serverUrl = null;
-    private ?TokenInterface $token = null;
 
-    public function withServerUrl(string $url): ClientBuilder
+    public function getTokenManager(): TokenManagerInterface
     {
-        $this->serverUrl = $url;
-
-        return $this;
+        return $this->tokenManager;
     }
 
     public function withTokenManagerClass(string $class, ConfigInterfaces $connection): ClientBuilder
     {
-        $manager = new $class($connection);
-        if (!$manager instanceof TokenManagerInterface) {
-            throw new \RuntimeException('class not tocker manager');
+        $tokenManager = new $class($connection);
+        if (!$tokenManager instanceof TokenManagerInterface) {
+            throw new \RuntimeException('class not token manager');
         }
 
-        $this->token = $manager->getToken();
+        $this->tokenManager = $tokenManager;
+
+        return $this;
+    }
+
+    public function withServerUrl(string $url): ClientBuilder
+    {
+        $this->serverUrl = $url;
 
         return $this;
     }
@@ -48,11 +52,10 @@ final class ClientBuilder
 
     public function build(array $config = []): GuzzleClient
     {
-
-        if ($this->token) {
+        if ($this->tokenManager->getToken()) {
             $stack = HandlerStack::create();
             $stack->push(new DefaultHeadersMiddleware());
-            $stack->push(new TokenMiddleware($this->token));
+            $stack->push(new TokenMiddleware($this->tokenManager->getToken()));
             $config['handler'] = $stack;
         }
 

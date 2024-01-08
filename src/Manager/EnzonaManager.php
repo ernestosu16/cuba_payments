@@ -6,7 +6,7 @@ use Lnx\CubaPayment\Guzzle\Manager\EnzonaTokenManager;
 use Lnx\CubaPayment\Request\RequestInterface;
 use RuntimeException;
 
-final class EnzonaManager extends BaseManager implements ManagerInterface
+final class EnzonaManager extends BaseManager
 {
     static function tokenManager(): string
     {
@@ -16,7 +16,7 @@ final class EnzonaManager extends BaseManager implements ManagerInterface
     public function execute(RequestInterface $request, $method, $uri): array
     {
         $form = json_decode(json_encode($request), true);
-        $response = $this->guzzle->request($method,$uri, [
+        $response = $this->guzzle()->request($method,$uri, [
             'json' => $form
         ]);
 

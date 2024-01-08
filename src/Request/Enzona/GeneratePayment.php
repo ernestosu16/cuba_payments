@@ -13,16 +13,16 @@ use Lnx\CubaPayment\Request\RequestInterface;
 )]
 class GeneratePayment implements RequestInterface
 {
-    private string $merchant_uuid;
-    private string $merchant_op_id;
-    private string $description;
-    private string $return_url;
-    private string $cancel_url;
-    private string $currency;
-    private string $buyer_identity_code;
-    private string $terminal_id;
-    private array $amount = [];
-    private array $items = [];
+    protected string $merchant_uuid;
+    protected string $merchant_op_id;
+    protected string $description;
+    protected string $return_url;
+    protected string $cancel_url;
+    protected string $currency;
+    protected string $buyer_identity_code;
+    protected string $terminal_id;
+    protected array $amount = [];
+    protected array $items = [];
 
     public function getMerchantUuid(): string
     {

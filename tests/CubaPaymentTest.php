@@ -3,8 +3,8 @@
 namespace Lnx\CubaPayment\Tests;
 
 use Lnx\CubaPayment\Config\EnzonaConfig;
+use Lnx\CubaPayment\Guzzle\Manager\EnzonaTokenManager;
 use Lnx\CubaPayment\PaymentManager;
-use Lnx\CubaPayment\Tests\Guzzle\EnzonaTokenManagerTestCase;
 use Lnx\CubaPayment\Tests\Request\Enzona\ConfirmPaymentTestCase;
 use Lnx\CubaPayment\Tests\Request\Enzona\GeneratePaymentTestCase;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,10 @@ class CubaPaymentTest extends TestCase
         $enzonaConfig = new EnzonaConfig('http://http/', 'ASSA#', 'SDASD');
 
         $manager = new PaymentManager($enzonaConfig);
-        $manager->withTokenManager(EnzonaTokenManagerTestCase::class);
+        $manager
+            ->withTokenManager(EnzonaTokenManager::class)
+            ->getTokenManager()->setUri('/enzona/token.php')
+        ;
 
         $generatePayment = new GeneratePaymentTestCase();
         $generatePayment

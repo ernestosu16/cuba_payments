@@ -1,12 +1,12 @@
 # Cuba Payments
 
-Es una librería en PHP para facilitar las metodos de transacciones con las pasarelas mas usada tanto en ENZONA como
+Es una librería en PHP para facilitar las método de transacciones con las pasarelas más usada tanto en ENZONA como
 Transfermovil
 
 # *Actualmente está en desarrollo*
 
 ## Ejemplo del código
-La idea que tengo es que sea facil de usar y manejar. No he podido hacerle pruebas porque el api de ENZONA de prueba que es https://apisandbox.enzona.net no funciona.
+La idea que tengo es que sea fácil de usar y manejar. No he podido hacerle pruebas porque el api de ENZONA de prueba que es https://apisandbox.enzona.net no funciona.
 
 ```php
 <?php

@@ -6,31 +6,27 @@ use GuzzleHttp;
 use Lnx\CubaPayment\Config\EnzonaConfig;
 use Lnx\CubaPayment\Guzzle\Token\EnzonaToken;
 use Lnx\CubaPayment\Guzzle\Token\TokenInterface;
+use RuntimeException;
 
-final class EnzonaTokenManager implements TokenManagerInterface
+final class EnzonaTokenManager extends BaseTokenManager
 {
-    public function __construct(private readonly EnzonaConfig $connection)
+    public function __construct(EnzonaConfig $connection)
     {
+        parent::__construct($connection, '/api/token');
     }
 
-    public function getToken(): TokenInterface
+    protected function getTokenManager(): TokenInterface
     {
-        if (isset($this->token) && $this->token->isValid()) {
-            return $this->token;
-        }
+        /** @var EnzonaConfig $connection */
+        $connection = $this->getConnection();
 
-        return $this->getEnzonaToken();
-    }
-
-    private function getEnzonaToken(): TokenInterface
-    {
         $client = new GuzzleHttp\Client([
             'verify' => false,
-            'base_uri' => $this->connection->url()]);
+            'base_uri' => $this->getConnection()->url()]);
 
-        $response = $client->post('/api/token', [
+        $response = $client->post($this->getUri(), [
             'header' => [
-                'Authorization' => 'Basic ' . base64_encode($this->connection->getConsumerKey() . ":" . $this->connection->getConsumerSecret())
+                'Authorization' => 'Basic ' . base64_encode($connection->getConsumerKey() . ":" . $connection->getConsumerSecret())
             ],
             'form_params' => [
                 'grant_type' => 'client_credentials',
@@ -39,7 +35,7 @@ final class EnzonaTokenManager implements TokenManagerInterface
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new \RuntimeException("Error getting token");
+            throw new RuntimeException("Error getting token");
         }
 
         $data = json_decode((string)$response->getBody(), true);

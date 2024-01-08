@@ -2,31 +2,49 @@
 
 namespace Lnx\CubaPayment\Manager;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Lnx\CubaPayment\Config\ConfigInterfaces;
 use Lnx\CubaPayment\Guzzle\ClientBuilder;
 
-abstract class BaseManager
+abstract class BaseManager implements ManagerInterface
 {
-    protected ClientInterface $guzzle;
+    private ?ClientBuilder $clientBuilder = null;
+    private ?Client $guzzle = null;
 
     public function __construct(
-        ConfigInterfaces             $connection,
-        private readonly string|null $tokenManagerClass = null
+        private readonly ConfigInterfaces $connection,
+        private readonly string|null      $tokenManagerClass = null
     )
     {
-        $this->guzzle = $this->buildGuzzle($connection);
     }
 
     abstract static function tokenManager(): string;
 
-    private function buildGuzzle(ConfigInterfaces $connection): ClientInterface
+    public function getClientBuilder(): ClientBuilder
+    {
+        if (!$this->clientBuilder) {
+            $this->clientBuilder = $this->buildGuzzle($this->connection);
+        }
+        return $this->clientBuilder;
+    }
+
+    public function guzzle(): ClientInterface
+    {
+        if (!$this->guzzle) {
+            $this->guzzle = $this->getClientBuilder()->build();
+        }
+        return $this->guzzle;
+    }
+
+
+    private function buildGuzzle(ConfigInterfaces $connection): ClientBuilder
     {
         $tokenManagerClass = $this->tokenManagerClass ?? static::tokenManager();
 
         $clientBuilder = new ClientBuilder();
         $clientBuilder->withServerUrl($connection->url());
         $clientBuilder->withTokenManagerClass($tokenManagerClass, $connection);
-        return $clientBuilder->build();
+        return $clientBuilder;
     }
 }

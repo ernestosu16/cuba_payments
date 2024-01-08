@@ -14,9 +14,9 @@ use Lnx\CubaPayment\Request\RequestInterface;
 )]
 class ConfirmPayment implements RequestInterface
 {
-    #[RequestValue(name: "transaction_uuid")]
-    private ?string $transaction_uuid = null;
+    protected ?string $transaction_uuid = null;
 
+    #[RequestValue(name: "transaction_uuid")]
     public function getTransactionUuid(): ?string
     {
         return $this->transaction_uuid;
